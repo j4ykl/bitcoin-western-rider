@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Bitcoin Western Rider</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+</head>
+
+<body>
+
+  <main class="game">
+
+    <!-- Bitcoin price display -->
+    <div class="price-box">
+
+      <span>
+        Bitcoin Price
+      </span>
+
+      <strong id="bitcoinPrice">
+        Loading...
+      </strong>
+
+      <div class="terrain-explanation">
+        REAL LIVE BTC PRICES • FAST 45-SECOND RIDE
+      </div>
+
+      <div
+  class="trail-status"
+  id="trailStatus"
+>
+  <span class="trail-status-title">
+    QUIET ON THE TRAIL
+  </span>
+
+  <span
+    class="trail-status-detail"
+    id="trailStatusDetail"
+  >
+    Waiting for market movement
+  </span>
+</div>
+    </div>
+<!-- Setting Western sun -->
+<div
+  class="western-sun"
+  aria-hidden="true"
+></div>
+
+<!-- Distant circling vultures -->
+<div
+  class="vulture-layer"
+  aria-hidden="true"
+>
+  <div class="vulture vulture-one">
+    <span class="vulture-wing-left"></span>
+    <span class="vulture-body"></span>
+    <span class="vulture-wing-right"></span>
+  </div>
+
+  <div class="vulture vulture-two">
+    <span class="vulture-wing-left"></span>
+    <span class="vulture-body"></span>
+    <span class="vulture-wing-right"></span>
+  </div>
+</div>
+    <!-- Daily Bitcoin mountain range -->
+<svg
+  class="daily-mountains"
+  id="dailyMountains"
+  viewBox="0 0 1000 400"
+  preserveAspectRatio="none"
+  xmlns="http://www.w3.org/2000/svg"
+  aria-hidden="true"
+>
+  <path
+    class="daily-mountain-shape"
+    d="
+      M 0 310
+      L 70 255
+      L 135 285
+      L 215 185
+      L 285 245
+      L 370 130
+      L 455 220
+      L 540 165
+      L 625 260
+      L 710 110
+      L 790 205
+      L 865 155
+      L 930 235
+      L 1000 190
+      L 1000 400
+      L 0 400
+      Z
+    "
+  ></path>
+</svg>
+
+    <!-- Highest displayed daily Bitcoin peak -->
+    <div
+      class="daily-peak-label"
+      id="dailyPeakLabel"
+      aria-live="polite"
+    >
+      <span
+  class="daily-peak-price"
+  id="dailyPeakPrice"
+></span>
+
+<span
+  class="daily-peak-date"
+  id="dailyPeakDate"
+></span>
+
+<span class="daily-peak-pointer">
+  ▲
+</span>
+    </div>
+
+    <!-- Rare bull and bear market surprises -->
+    <div
+      class="market-surprise-layer"
+      aria-hidden="true"
+    >
+      <div
+        class="market-animal market-bull"
+        id="marketBull"
+      >
+        <svg
+          viewBox="0 0 180 90"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <ellipse cx="91" cy="45" rx="53" ry="25"></ellipse>
+          <circle cx="143" cy="43" r="18"></circle>
+
+          <path
+            d="M151 29 C164 13 174 17 165 33"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="7"
+            stroke-linecap="round"
+          ></path>
+
+          <path
+            d="M138 29 C126 13 116 17 124 33"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="7"
+            stroke-linecap="round"
+          ></path>
+
+          <rect x="54" y="60" width="10" height="24" rx="3"></rect>
+          <rect x="82" y="62" width="10" height="22" rx="3"></rect>
+          <rect x="112" y="61" width="10" height="23" rx="3"></rect>
+          <rect x="137" y="59" width="10" height="25" rx="3"></rect>
+
+          <path
+            d="M39 39 C21 29 17 17 25 12"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="6"
+            stroke-linecap="round"
+          ></path>
+        </svg>
+      </div>
+
+      <div
+        class="market-animal market-bear"
+        id="marketBear"
+      >
+        <svg
+          viewBox="0 0 180 95"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <ellipse cx="90" cy="49" rx="55" ry="28"></ellipse>
+          <circle cx="142" cy="41" r="21"></circle>
+          <circle cx="132" cy="23" r="8"></circle>
+          <circle cx="151" cy="22" r="8"></circle>
+          <ellipse cx="158" cy="46" rx="13" ry="9"></ellipse>
+
+          <rect x="48" y="63" width="13" height="25" rx="5"></rect>
+          <rect x="78" y="66" width="13" height="22" rx="5"></rect>
+          <rect x="111" y="65" width="13" height="23" rx="5"></rect>
+          <rect x="137" y="62" width="13" height="26" rx="5"></rect>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Slowly moving distant desert hills -->
+    <div
+      class="distant-hills"
+      aria-hidden="true"
+    >
+
+      <div class="distant-hills-track">
+
+        <!-- First distant-hill section -->
+        <div class="distant-hills-section">
+
+          <div
+            class="distant-hill distant-hill-one"
+          ></div>
+
+          <div
+            class="distant-hill distant-hill-two"
+          ></div>
+
+          <div
+            class="distant-hill distant-hill-three"
+          ></div>
+
+          <div
+            class="distant-hill distant-hill-four"
+          ></div>
+
+        </div>
+
+
+        <!-- Duplicate section for seamless looping -->
+        <div class="distant-hills-section">
+
+          <div
+            class="distant-hill distant-hill-one"
+          ></div>
+
+          <div
+            class="distant-hill distant-hill-two"
+          ></div>
+
+          <div
+            class="distant-hill distant-hill-three"
+          ></div>
+
+          <div
+            class="distant-hill distant-hill-four"
+          ></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Medium-speed Western scenery -->
+    <div
+      class="western-scenery"
+      aria-hidden="true"
+    >
+
+      <div class="western-scenery-track">
+
+        <!-- First scenery section -->
+        <div class="western-scenery-section">
+
+          <div class="cactus cactus-one">
+
+            <span
+              class="cactus-arm cactus-arm-left"
+            ></span>
+
+            <span
+              class="cactus-arm cactus-arm-right"
+            ></span>
+
+          </div>
+
+
+          <div class="rock rock-one"></div>
+
+
+          <div
+            class="western-sign western-sign-one"
+          >
+
+            <div class="sign-board">
+              BTC TRAIL
+            </div>
+
+            <div
+              class="sign-post sign-post-left"
+            ></div>
+
+            <div
+              class="sign-post sign-post-right"
+            ></div>
+
+          </div>
+
+
+          <div class="rock rock-two"></div>
+
+
+          <div class="cactus cactus-two">
+
+            <span
+              class="cactus-arm cactus-arm-left"
+            ></span>
+
+            <span
+              class="cactus-arm cactus-arm-right"
+            ></span>
+
+          </div>
+
+
+          <div class="rock rock-three"></div>
+
+        </div>
+
+
+        <!-- Duplicate scenery section -->
+        <div class="western-scenery-section">
+
+          <div class="cactus cactus-one">
+
+            <span
+              class="cactus-arm cactus-arm-left"
+            ></span>
+
+            <span
+              class="cactus-arm cactus-arm-right"
+            ></span>
+
+          </div>
+
+
+          <div class="rock rock-one"></div>
+
+
+          <div
+            class="western-sign western-sign-one"
+          >
+
+            <div class="sign-board">
+              BEAR CANYON
+            </div>
+
+            <div
+              class="sign-post sign-post-left"
+            ></div>
+
+            <div
+              class="sign-post sign-post-right"
+            ></div>
+
+          </div>
+
+
+          <div class="rock rock-two"></div>
+
+
+          <div class="cactus cactus-two">
+
+            <span
+              class="cactus-arm cactus-arm-left"
+            ></span>
+
+            <span
+              class="cactus-arm cactus-arm-right"
+            ></span>
+
+          </div>
+
+
+          <div class="rock rock-three"></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Rolling tumbleweed -->
+<div
+  class="tumbleweed-layer"
+  aria-hidden="true"
+>
+  <div class="tumbleweed"></div>
+</div>
+    <!-- Live Bitcoin price-generated hills -->
+    <svg
+      class="bitcoin-hills"
+      id="bitcoinHills"
+      viewBox="0 0 1000 400"
+      preserveAspectRatio="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+
+      <path
+        class="hill-shape"
+        d="
+          M 0 240
+
+          C 60 220,
+            120 180,
+            190 230
+
+          C 250 275,
+            300 130,
+            380 180
+
+          C 450 225,
+            510 165,
+            580 245
+
+          C 650 315,
+            690 95,
+            760 165
+
+          C 820 225,
+            880 135,
+            1000 225
+
+          L 1000 400
+
+          L 0 400
+
+          Z
+        "
+      >
+      </path>
+
+    </svg>
+
+
+    <!-- Bitcoin cowboy mascot riding the live trail -->
+    <div
+      class="rider"
+      id="rider"
+    >
+      <img
+        class="bitcoin-cowboy-mascot"
+        src="bitcoin_cowboy.png"
+        alt="Bitcoin cowboy mascot"
+      >
+    </div>
+
+  <!-- Creator X profile -->
+  <a
+    class="x-profile-link"
+    href="https://x.com/J4YKL"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Visit J4YKL on X"
+  >
+      𝕏
+  </a>
+
+  </main>
+
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>
