@@ -997,6 +997,623 @@ body {
 
 }
 /* ------------------------------ */
+/* Permanent current-block sign   */
+/* ------------------------------ */
+
+.current-block-panel {
+  position: absolute;
+
+  top: 25px;
+  right: 25px;
+
+  z-index: 10;
+
+  display: flex;
+
+  flex-direction: column;
+  align-items: center;
+
+  min-width: 190px;
+
+  padding:
+    12px
+    17px;
+
+  color: #f8d799;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(112, 63, 27, 0.94),
+      rgba(55, 29, 14, 0.94)
+    );
+
+  border:
+    3px
+    solid
+    #b97932;
+
+  border-radius: 7px;
+
+  box-shadow:
+    0 5px 14px
+    rgba(45, 24, 12, 0.28),
+    inset 0 0 0 2px
+    rgba(242, 197, 124, 0.12);
+
+  font-family:
+    Georgia,
+    serif;
+
+  text-align: center;
+
+  pointer-events: none;
+
+  transform-origin: center;
+}
+
+.current-block-title {
+  margin-bottom: 3px;
+
+  color: #f2c57c;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 11px;
+  font-weight: bold;
+
+  letter-spacing: 1.4px;
+}
+
+.current-block-number {
+  font-size: 23px;
+
+  line-height: 1.1;
+}
+
+.current-block-age {
+  margin-top: 5px;
+
+  color: white;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.current-block-panel.is-updated {
+  animation:
+    currentBlockUpdated
+    1s
+    ease-out
+    1;
+}
+
+@keyframes currentBlockUpdated {
+  0% {
+    transform:
+      scale(1);
+  }
+
+  35% {
+    border-color: #ffd56a;
+
+    box-shadow:
+      0 5px 14px
+      rgba(45, 24, 12, 0.28),
+      0 0 24px
+      rgba(255, 190, 37, 0.72);
+
+    transform:
+      translateY(-3px)
+      scale(1.06);
+  }
+
+  100% {
+    transform:
+      scale(1);
+  }
+}
+
+/* ------------------------------ */
+/* Real block-mined surprise      */
+/* ------------------------------ */
+
+.block-event-layer {
+  position: absolute;
+
+  inset: 0;
+
+  /* Below the rider (z-index 5), above the trail (z-index 2). */
+  z-index: 4;
+
+  overflow: hidden;
+
+  pointer-events: none;
+
+  visibility: hidden;
+}
+
+.block-event-layer.is-active {
+  visibility: visible;
+}
+
+.block-impact-site {
+  position: absolute;
+
+  width: 104px;
+  height: 104px;
+
+  transform:
+    translateX(-50%);
+}
+
+.block-shadow {
+  position: absolute;
+
+  left: 50%;
+  bottom: -2px;
+
+  width: 72px;
+  height: 17px;
+
+  background-color:
+    rgba(45, 24, 12, 0.32);
+
+  border-radius: 50%;
+
+  opacity: 0;
+
+  transform:
+    translateX(-50%)
+    scale(0.35);
+}
+
+.falling-bitcoin-block {
+  position: absolute;
+
+  left: 50%;
+  bottom: 11px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 56px;
+  height: 56px;
+
+  color: #5f3108;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffe889,
+      #f59d08 72%
+    );
+
+  border:
+    4px
+    solid
+    #8f4b08;
+
+  border-radius: 5px;
+
+  box-shadow:
+    0 0 22px
+    rgba(255, 188, 32, 0.7),
+    inset 0 0 0 2px
+    rgba(255, 244, 171, 0.35);
+
+  opacity: 0;
+
+  transform:
+    translate(-50%, -78vh)
+    rotate(-10deg);
+
+  transform-origin:
+    center bottom;
+}
+
+/* Small top and side faces make it read as a Bitcoin block/cube. */
+.falling-bitcoin-block::before,
+.falling-bitcoin-block::after {
+  content: "";
+
+  position: absolute;
+
+  pointer-events: none;
+}
+
+.falling-bitcoin-block::before {
+  left: 4px;
+  top: -10px;
+
+  width: 47px;
+  height: 10px;
+
+  background-color: #ffd35b;
+
+  border:
+    3px
+    solid
+    #8f4b08;
+
+  border-bottom: 0;
+
+  transform:
+    skewX(-35deg);
+
+  transform-origin:
+    left bottom;
+}
+
+.falling-bitcoin-block::after {
+  right: -10px;
+  top: -4px;
+
+  width: 10px;
+  height: 50px;
+
+  background-color: #c87407;
+
+  border:
+    3px
+    solid
+    #713704;
+
+  border-left: 0;
+
+  transform:
+    skewY(-35deg);
+
+  transform-origin:
+    left top;
+}
+
+.falling-bitcoin-mark {
+  position: relative;
+
+  z-index: 1;
+
+  font-family:
+    Georgia,
+    serif;
+
+  font-size: 34px;
+  font-weight: bold;
+
+  line-height: 1;
+
+  text-shadow:
+    1px 2px 0
+    rgba(255, 236, 151, 0.55);
+
+  animation:
+    bitcoinBlockGlow
+    2.4s
+    ease-in-out
+    1.7s
+    infinite;
+}
+
+.block-impact-dust {
+  position: absolute;
+
+  left: 50%;
+  bottom: -3px;
+
+  width: 140px;
+  height: 58px;
+
+  opacity: 0;
+
+  transform:
+    translateX(-50%);
+}
+
+.block-impact-dust span {
+  position: absolute;
+
+  bottom: 0;
+
+  width: 45px;
+  height: 31px;
+
+  background-color:
+    rgba(211, 146, 77, 0.82);
+
+  border-radius: 50%;
+}
+
+.block-impact-dust span:nth-child(1) {
+  left: 4px;
+}
+
+.block-impact-dust span:nth-child(2) {
+  left: 47px;
+
+  width: 52px;
+  height: 39px;
+}
+
+.block-impact-dust span:nth-child(3) {
+  right: 3px;
+}
+
+.block-mined-message {
+  position: absolute;
+
+  left: 50%;
+  top: 16%;
+
+  display: flex;
+
+  flex-direction: column;
+  align-items: center;
+
+  min-width: 245px;
+
+  padding:
+    11px
+    18px;
+
+  color: #f8d799;
+
+  background-color:
+    rgba(49, 27, 14, 0.9);
+
+  border:
+    3px
+    solid
+    #b97932;
+
+  border-radius: 7px;
+
+  box-shadow:
+    0 5px 14px
+    rgba(45, 24, 12, 0.3);
+
+  font-family:
+    Georgia,
+    serif;
+
+  text-align: center;
+
+  opacity: 0;
+
+  transform:
+    translate(-50%, -12px)
+    scale(0.92);
+}
+
+.block-mined-title {
+  margin-bottom: 3px;
+
+  color: #f2c57c;
+
+  font-size: 13px;
+  font-weight: bold;
+
+  letter-spacing: 1.4px;
+}
+
+.block-mined-number {
+  font-size: 22px;
+}
+
+.block-mined-detail {
+  margin-top: 3px;
+
+  color: white;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 11px;
+}
+
+.block-event-layer.is-active
+.block-shadow {
+  animation:
+    blockShadowArrives
+    30.5s
+    ease-out
+    forwards;
+}
+
+.block-event-layer.is-active
+.falling-bitcoin-block {
+  animation:
+    bitcoinBlockFalls
+    30.5s
+    cubic-bezier(0.45, 0.05, 0.55, 0.95)
+    forwards;
+}
+
+.block-event-layer.is-active
+.block-impact-dust {
+  animation:
+    blockDustBurst
+    1.45s
+    ease-out
+    1.08s
+    forwards;
+}
+
+.block-event-layer.is-active
+.block-mined-message {
+  animation:
+    showBlockMinedMessage
+    5.4s
+    ease
+    1.35s
+    forwards;
+}
+
+@keyframes bitcoinBlockFalls {
+  0% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -78vh)
+      rotate(-10deg);
+  }
+
+  1% {
+    opacity: 1;
+  }
+
+  3.5% {
+    opacity: 1;
+
+    transform:
+      translate(-50%, 0)
+      rotate(2deg)
+      scaleY(0.88);
+  }
+
+  4.2% {
+    transform:
+      translate(-50%, -9px)
+      rotate(-1deg)
+      scaleY(1.03);
+  }
+
+  5% {
+    transform:
+      translate(-50%, 0)
+      rotate(0deg)
+      scaleY(1);
+  }
+
+  94% {
+    opacity: 1;
+
+    transform:
+      translate(-50%, 0)
+      rotate(0deg)
+      scaleY(1);
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, 2px)
+      rotate(0deg)
+      scale(0.96);
+  }
+}
+
+@keyframes bitcoinBlockGlow {
+  0%,
+  100% {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+
+  50% {
+    opacity: 0.84;
+
+    transform:
+      scale(1.04);
+  }
+}
+
+@keyframes blockShadowArrives {
+  0% {
+    opacity: 0;
+
+    transform:
+      translateX(-50%)
+      scale(0.25);
+  }
+
+  3.5% {
+    opacity: 0.5;
+
+    transform:
+      translateX(-50%)
+      scale(1);
+  }
+
+  94% {
+    opacity: 0.45;
+
+    transform:
+      translateX(-50%)
+      scale(1);
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translateX(-50%)
+      scale(0.9);
+  }
+}
+
+@keyframes blockDustBurst {
+  0% {
+    opacity: 0;
+
+    transform:
+      translateX(-50%)
+      scale(0.3);
+  }
+
+  18% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translateX(-50%)
+      translateY(-19px)
+      scale(1.25);
+  }
+}
+
+@keyframes showBlockMinedMessage {
+  0% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -12px)
+      scale(0.92);
+  }
+
+  14%,
+  76% {
+    opacity: 1;
+
+    transform:
+      translate(-50%, 0)
+      scale(1);
+  }
+
+  100% {
+    opacity: 0;
+
+    transform:
+      translate(-50%, -7px)
+      scale(0.97);
+  }
+}
+
+
+/* ------------------------------ */
 /* Creator X profile link         */
 /* ------------------------------ */
 
@@ -1299,188 +1916,6 @@ body {
 }
 
 
-/* ------------------------------ */
-/* Rare market animal surprises   */
-/* ------------------------------ */
-
-.market-surprise-layer {
-  position: absolute;
-
-  left: 0;
-  bottom: 30%;
-
-  z-index: 1;
-
-  width: 100%;
-  height: 24%;
-
-  overflow: hidden;
-
-  pointer-events: none;
-}
-
-.market-animal {
-  position: absolute;
-
-  bottom: 2px;
-
-  width: 145px;
-
-  color: #35251c;
-
-  opacity: 0;
-
-  filter:
-    drop-shadow(
-      0 4px 2px
-      rgba(69, 36, 18, 0.18)
-    );
-
-  pointer-events: none;
-
-  will-change:
-    transform,
-    opacity;
-}
-
-.market-animal svg {
-  display: block;
-
-  width: 100%;
-  height: auto;
-
-  fill: currentColor;
-}
-
-.market-bull {
-  right: -180px;
-}
-
-.market-bear {
-  left: -180px;
-
-  width: 130px;
-}
-
-.market-bull.is-active {
-  animation:
-    bullCrossesTrail
-    12s
-    linear
-    1;
-}
-
-.market-bear.is-active {
-  animation:
-    bearCrossesCanyon
-    9s
-    ease-in-out
-    1;
-}
-
-@keyframes bullCrossesTrail {
-
-  0% {
-    opacity: 0;
-
-    transform:
-      translateX(0)
-      translateY(0)
-      scale(0.78);
-  }
-
-  8% {
-    opacity: 0.68;
-  }
-
-  24% {
-    transform:
-      translateX(-28vw)
-      translateY(-5px)
-      scale(0.8);
-  }
-
-  48% {
-    transform:
-      translateX(-58vw)
-      translateY(1px)
-      scale(0.82);
-  }
-
-  72% {
-    transform:
-      translateX(-88vw)
-      translateY(-6px)
-      scale(0.8);
-  }
-
-  92% {
-    opacity: 0.68;
-  }
-
-  100% {
-    opacity: 0;
-
-    transform:
-      translateX(-125vw)
-      translateY(0)
-      scale(0.78);
-  }
-
-}
-
-@keyframes bearCrossesCanyon {
-
-  0% {
-    opacity: 0;
-
-    transform:
-      translateX(0)
-      translateY(0)
-      scale(0.72);
-  }
-
-  10% {
-    opacity: 0.62;
-  }
-
-  28% {
-    transform:
-      translateX(28vw)
-      translateY(-2px)
-      scale(0.74);
-  }
-
-  52% {
-    transform:
-      translateX(58vw)
-      translateY(3px)
-      scale(0.76);
-  }
-
-  76% {
-    transform:
-      translateX(88vw)
-      translateY(-2px)
-      scale(0.74);
-  }
-
-  92% {
-    opacity: 0.62;
-  }
-
-  100% {
-    opacity: 0;
-
-    transform:
-      translateX(125vw)
-      translateY(1px)
-      scale(0.72);
-  }
-
-}
-
-
 /* Keep the cleaner view selected earlier. */
 .distant-hills {
   display: none;
@@ -1504,26 +1939,16 @@ body {
     height: 85px;
   }
 
-  .market-animal {
-    width: 110px;
-  }
-
-  .market-bear {
-    width: 100px;
-  }
-
 }
 
 
 @media (prefers-reduced-motion: reduce) {
 
   .vulture,
-  .market-animal {
+  .falling-bitcoin-block,
+  .falling-bitcoin-mark,
+  .block-impact-dust {
     animation: none !important;
-  }
-
-  .market-surprise-layer {
-    display: none;
   }
 
 }
@@ -1531,4 +1956,59 @@ body {
 /* Tumbleweed removed from the visible scene. */
 .tumbleweed-layer {
   display: none;
+}
+
+
+@media (max-width: 600px) {
+  .current-block-panel {
+    top: 15px;
+    right: 15px;
+
+    min-width: 145px;
+
+    padding:
+      9px
+      11px;
+  }
+
+  .current-block-title {
+    font-size: 9px;
+  }
+
+  .current-block-number {
+    font-size: 18px;
+  }
+
+  .current-block-age {
+    font-size: 9px;
+  }
+
+  .block-impact-site {
+    transform:
+      translateX(-50%)
+      scale(0.82);
+
+    transform-origin:
+      center bottom;
+  }
+
+  .block-mined-message {
+    top: 28%;
+
+    min-width: 205px;
+
+    padding:
+      9px
+      12px;
+  }
+
+  .block-mined-number {
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .block-event-layer {
+    display: none;
+  }
 }

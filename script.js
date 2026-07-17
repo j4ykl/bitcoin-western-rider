@@ -49,15 +49,37 @@ const game =
   );
 
 
-const marketBull =
+const blockEventLayer =
   document.getElementById(
-    "marketBull"
+    "blockEventLayer"
   );
 
-const marketBear =
+const blockImpactSite =
   document.getElementById(
-    "marketBear"
+    "blockImpactSite"
   );
+
+const blockMinedNumber =
+  document.getElementById(
+    "blockMinedNumber"
+  );
+
+const currentBlockPanel =
+  document.getElementById(
+    "currentBlockPanel"
+  );
+
+const currentBlockNumber =
+  document.getElementById(
+    "currentBlockNumber"
+  );
+
+const currentBlockAge =
+  document.getElementById(
+    "currentBlockAge"
+  );
+
+
 
 
 /* -------------------------------- */
@@ -80,6 +102,43 @@ const REST_PRICE_URL =
 */
 const DAILY_CANDLES_URL =
   "https://api.exchange.coinbase.com/products/BTC-USD/candles";
+
+
+/*
+  Lightweight Bitcoin network check.
+
+  The chain-tip endpoint returns only the current
+  block height, so this adds very little network or
+  processing work compared with the terrain animation.
+*/
+const BLOCK_API_BASE_URL =
+  "https://blockstream.info/api";
+
+const BLOCK_HEIGHT_URL =
+  `${BLOCK_API_BASE_URL}/blocks/tip/height`;
+
+const BLOCK_HEIGHT_CHECK_INTERVAL =
+  30 * 1000;
+
+const BLOCK_AGE_UPDATE_INTERVAL =
+  15 * 1000;
+
+/*
+  Keep the landed Bitcoin block visible long
+  enough for visitors to notice the mined-block scene.
+*/
+const BLOCK_EVENT_CLEANUP_DELAY =
+  32 * 1000;
+
+const BLOCK_EVENT_LANDING_X = 820;
+
+/*
+  Move the landed Bitcoin block with the Western world rather
+  than keeping it fixed beside the centred rider. This
+  roughly matches the existing 24-second scenery crossing.
+*/
+const BLOCK_EVENT_WORLD_SPEED =
+  1000 / 24;
 
 
 /* -------------------------------- */
@@ -248,41 +307,6 @@ const MAXIMUM_SMALL_PRICE_BUMP = 20;
 
 
 /* -------------------------------- */
-/* Rare market surprise settings    */
-/* -------------------------------- */
-
-/*
-  A bull or bear can appear only when BTC
-  moves by at least this much between the
-  three-second terrain samples.
-*/
-const MARKET_SURPRISE_THRESHOLD = 50;
-
-
-/*
-  Even after a qualifying move, keep the
-  event uncommon so it remains a surprise.
-*/
-const MARKET_SURPRISE_CHANCE = 1;
-
-
-/*
-  Prevent repeated animals during a burst
-  of volatile market activity.
-*/
-const MARKET_SURPRISE_COOLDOWN =
-  60 * 1000;
-
-
-/*
-  Slightly exceeds the longest CSS crossing
-  animation so the active class is cleaned up.
-*/
-const MARKET_SURPRISE_CLEANUP_DELAY =
-  14 * 1000;
-
-
-/* -------------------------------- */
 /* Price state                      */
 /* -------------------------------- */
 
@@ -319,12 +343,22 @@ let currentDailyPeak = null;
 
 
 /* -------------------------------- */
-/* Market surprise state            */
+/* Bitcoin block event state        */
 /* -------------------------------- */
 
-let lastMarketSurpriseTime = 0;
+let latestKnownBlockHeight = null;
 
-let marketSurpriseCleanupTimer = null;
+let latestKnownBlockTimestamp = null;
+
+let blockHeightRequestInProgress = false;
+
+let blockEventCleanupTimer = null;
+
+let blockEventWorldX = null;
+
+let blockEventLandingBottom = null;
+
+let lastSmoothTerrainPoints = [];
 
 
 /* -------------------------------- */
@@ -1575,127 +1609,482 @@ function checkLivePriceConnection() {
 
 
 /* -------------------------------- */
-/* Rare bull and bear surprises     */
+/* Real Bitcoin block event         */
 /* -------------------------------- */
 
-function clearMarketSurprise() {
+function formatBlockAge(
+  blockTimestamp
+) {
   if (
-    marketSurpriseCleanupTimer !== null
+    !Number.isFinite(
+      blockTimestamp
+    )
+  ) {
+    return "Latest Bitcoin network tip";
+  }
+
+
+  const elapsedSeconds =
+    Math.max(
+      0,
+      Math.floor(
+        Date.now() / 1000 -
+        blockTimestamp
+      )
+    );
+
+
+  if (elapsedSeconds < 60) {
+    return "Found just now";
+  }
+
+
+  const elapsedMinutes =
+    Math.floor(
+      elapsedSeconds / 60
+    );
+
+
+  if (elapsedMinutes < 60) {
+    return `Found ${elapsedMinutes} ${
+      elapsedMinutes === 1
+        ? "minute"
+        : "minutes"
+    } ago`;
+  }
+
+
+  const elapsedHours =
+    Math.floor(
+      elapsedMinutes / 60
+    );
+
+
+  return `Found ${elapsedHours} ${
+    elapsedHours === 1
+      ? "hour"
+      : "hours"
+  } ago`;
+}
+
+
+function updateCurrentBlockAge() {
+  if (!currentBlockAge) {
+    return;
+  }
+
+
+  currentBlockAge.textContent =
+    formatBlockAge(
+      latestKnownBlockTimestamp
+    );
+}
+
+
+function updateCurrentBlockPanel(
+  blockHeight,
+  blockTimestamp,
+  highlight = false
+) {
+  if (currentBlockNumber) {
+    currentBlockNumber.textContent =
+      `#${Number(
+        blockHeight
+      ).toLocaleString(
+        "en-US"
+      )}`;
+  }
+
+
+  latestKnownBlockTimestamp =
+    Number.isFinite(
+      blockTimestamp
+    )
+      ? blockTimestamp
+      : Math.floor(
+          Date.now() / 1000
+        );
+
+
+  updateCurrentBlockAge();
+
+
+  if (
+    highlight &&
+    currentBlockPanel
+  ) {
+    currentBlockPanel.classList.remove(
+      "is-updated"
+    );
+
+    void currentBlockPanel.offsetWidth;
+
+    currentBlockPanel.classList.add(
+      "is-updated"
+    );
+
+    setTimeout(
+      () => {
+        currentBlockPanel.classList.remove(
+          "is-updated"
+        );
+      },
+      1100
+    );
+  }
+}
+
+
+async function requestBlockTimestamp(
+  blockHeight
+) {
+  const hashResponse =
+    await fetch(
+      `${BLOCK_API_BASE_URL}/block-height/${blockHeight}`,
+      {
+        cache: "no-store"
+      }
+    );
+
+
+  if (!hashResponse.ok) {
+    throw new Error(
+      `Block-hash request failed: ${
+        hashResponse.status
+      }`
+    );
+  }
+
+
+  const blockHash =
+    (
+      await hashResponse.text()
+    ).trim();
+
+
+  if (!blockHash) {
+    throw new Error(
+      "The block service returned an empty block hash."
+    );
+  }
+
+
+  const blockResponse =
+    await fetch(
+      `${BLOCK_API_BASE_URL}/block/${blockHash}`,
+      {
+        cache: "no-store"
+      }
+    );
+
+
+  if (!blockResponse.ok) {
+    throw new Error(
+      `Block-details request failed: ${
+        blockResponse.status
+      }`
+    );
+  }
+
+
+  const blockData =
+    await blockResponse.json();
+
+
+  const blockTimestamp =
+    Number(
+      blockData?.timestamp
+    );
+
+
+  if (
+    !Number.isFinite(
+      blockTimestamp
+    ) ||
+    blockTimestamp <= 0
+  ) {
+    throw new Error(
+      "The block service returned an invalid timestamp."
+    );
+  }
+
+
+  return blockTimestamp;
+}
+
+
+function clearBlockEvent() {
+  if (
+    blockEventCleanupTimer !== null
   ) {
     clearTimeout(
-      marketSurpriseCleanupTimer
+      blockEventCleanupTimer
     );
 
-    marketSurpriseCleanupTimer = null;
+    blockEventCleanupTimer = null;
   }
 
 
-  if (marketBull) {
-    marketBull.classList.remove(
-      "is-active"
-    );
-  }
+  blockEventWorldX = null;
+
+  blockEventLandingBottom = null;
 
 
-  if (marketBear) {
-    marketBear.classList.remove(
+  if (blockEventLayer) {
+    blockEventLayer.classList.remove(
       "is-active"
     );
   }
 }
 
 
-function playMarketAnimal(
-  animal
+function setBlockImpactLanding(
+  smoothTerrainPoints =
+    lastSmoothTerrainPoints
 ) {
-  if (!animal) {
+  if (
+    !blockImpactSite ||
+    !Array.isArray(
+      smoothTerrainPoints
+    ) ||
+    smoothTerrainPoints.length < 2
+  ) {
     return;
   }
 
 
-  clearMarketSurprise();
+  const landingTerrain =
+    sampleTerrainAtX(
+      smoothTerrainPoints,
+      BLOCK_EVENT_LANDING_X
+    );
+
+
+  const terrainHeight =
+    400 - landingTerrain.y;
+
+
+  blockEventWorldX =
+    BLOCK_EVENT_LANDING_X;
+
+
+  blockEventLandingBottom =
+    (
+      terrainHeight /
+      400
+    ) * 48 - 1.5;
+
+
+  updateBlockImpactSitePosition();
+}
+
+
+function updateBlockImpactSitePosition() {
+  if (
+    !blockImpactSite ||
+    blockEventWorldX === null ||
+    blockEventLandingBottom === null
+  ) {
+    return;
+  }
+
+
+  blockImpactSite.style.left =
+    `${
+      (
+        blockEventWorldX /
+        1000
+      ) * 100
+    }%`;
+
+
+  blockImpactSite.style.bottom =
+    `${blockEventLandingBottom}%`;
+}
+
+
+function playBlockMinedEvent(
+  blockHeight
+) {
+  if (
+    document.hidden ||
+    !blockEventLayer ||
+    !blockMinedNumber
+  ) {
+    return;
+  }
+
+
+  clearBlockEvent();
+
+
+  blockMinedNumber.textContent =
+    `BLOCK #${
+      Number(blockHeight).toLocaleString(
+        "en-US"
+      )
+    }`;
+
+
+  setBlockImpactLanding();
 
 
   /*
-    Reading offsetWidth restarts the CSS
-    animation when the same reusable animal
-    appears again later. No new DOM elements
-    are created, so memory cannot accumulate.
+    Force a style read so the same reusable event can
+    restart cleanly when another block is mined later.
   */
-  void animal.offsetWidth;
+  void blockEventLayer.offsetWidth;
 
 
-  animal.classList.add(
+  blockEventLayer.classList.add(
     "is-active"
   );
 
 
-  marketSurpriseCleanupTimer =
+  blockEventCleanupTimer =
     setTimeout(
       () => {
-        animal.classList.remove(
+        blockEventLayer.classList.remove(
           "is-active"
         );
 
-        marketSurpriseCleanupTimer =
-          null;
+        blockEventCleanupTimer = null;
       },
-      MARKET_SURPRISE_CLEANUP_DELAY
+      BLOCK_EVENT_CLEANUP_DELAY
     );
 }
 
 
-function maybeTriggerMarketSurprise(
-  priceChange
-) {
+async function checkForNewBitcoinBlock() {
   if (
     document.hidden ||
-    Math.abs(priceChange) <
-      MARKET_SURPRISE_THRESHOLD
+    blockHeightRequestInProgress
   ) {
     return;
   }
 
 
-  const currentTime =
-    Date.now();
+  blockHeightRequestInProgress =
+    true;
 
 
-  if (
-    currentTime -
-    lastMarketSurpriseTime <
-    MARKET_SURPRISE_COOLDOWN
-  ) {
-    return;
+  try {
+    const response =
+      await fetch(
+        `${BLOCK_HEIGHT_URL}?time=${Date.now()}`,
+        {
+          cache: "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+      throw new Error(
+        `Block-height request failed: ${
+          response.status
+        }`
+      );
+    }
+
+
+    const responseText =
+      await response.text();
+
+
+    const blockHeight =
+      Number.parseInt(
+        responseText.trim(),
+        10
+      );
+
+
+    if (
+      !Number.isSafeInteger(
+        blockHeight
+      ) ||
+      blockHeight <= 0
+    ) {
+      throw new Error(
+        "The block-height service returned invalid data."
+      );
+    }
+
+
+    const isFirstBlockCheck =
+      latestKnownBlockHeight === null;
+
+
+    const isNewBlock =
+      !isFirstBlockCheck &&
+      blockHeight >
+        latestKnownBlockHeight;
+
+
+    if (
+      !isFirstBlockCheck &&
+      !isNewBlock
+    ) {
+      updateCurrentBlockAge();
+
+      return;
+    }
+
+
+    latestKnownBlockHeight =
+      blockHeight;
+
+
+    let blockTimestamp;
+
+
+    try {
+      blockTimestamp =
+        await requestBlockTimestamp(
+          blockHeight
+        );
+
+    } catch (detailsError) {
+      console.warn(
+        "Unable to load the latest block timestamp:",
+        detailsError
+      );
+
+      blockTimestamp =
+        Math.floor(
+          Date.now() / 1000
+        );
+    }
+
+
+    updateCurrentBlockPanel(
+      blockHeight,
+      blockTimestamp,
+      isNewBlock
+    );
+
+
+    /*
+      Establish the starting height silently. The block
+      drops only when a genuinely newer block appears
+      after the page has begun watching.
+    */
+    if (isNewBlock) {
+      playBlockMinedEvent(
+        blockHeight
+      );
+    }
+
+
+  } catch (error) {
+    console.warn(
+      "Unable to check the latest Bitcoin block:",
+      error
+    );
+
+  } finally {
+    blockHeightRequestInProgress =
+      false;
   }
-
-
-  if (
-    Math.random() >
-    MARKET_SURPRISE_CHANCE
-  ) {
-    return;
-  }
-
-
-  const selectedAnimal =
-    priceChange > 0
-      ? marketBull
-      : marketBear;
-
-
-  if (!selectedAnimal) {
-    return;
-  }
-
-
-  lastMarketSurpriseTime =
-    currentTime;
-
-
-  playMarketAnimal(
-    selectedAnimal
-  );
 }
 
 
@@ -1829,11 +2218,6 @@ function advanceTerrainPoint() {
 
 
   updateTrailStatus(
-    priceChange
-  );
-
-
-  maybeTriggerMarketSurprise(
     priceChange
   );
 
@@ -2521,6 +2905,10 @@ function renderTerrain() {
     );
 
 
+  lastSmoothTerrainPoints =
+    smoothTerrainPoints;
+
+
   const terrainPath =
     createTerrainPath(
       smoothTerrainPoints
@@ -2536,6 +2924,14 @@ function renderTerrain() {
   moveRiderWithTerrain(
     smoothTerrainPoints
   );
+
+
+  /*
+    The landed block is not re-sampled at a fixed screen
+    position. Its landing height stays fixed while its world
+    x-position moves left, allowing the centred rider to pass it.
+  */
+  updateBlockImpactSitePosition();
 }
 
 
@@ -2579,6 +2975,24 @@ function animateTerrain(
       elapsedTime /
       1000
     );
+
+
+  if (
+    blockEventLayer &&
+    blockEventLayer.classList.contains(
+      "is-active"
+    ) &&
+    blockEventWorldX !== null
+  ) {
+    blockEventWorldX -=
+      BLOCK_EVENT_WORLD_SPEED *
+      (
+        elapsedTime /
+        1000
+      );
+
+    updateBlockImpactSitePosition();
+  }
 
 
   while (
@@ -2664,6 +3078,9 @@ document.addEventListener(
       to the browser tab.
     */
     updateDailyMountains();
+
+
+    checkForNewBitcoinBlock();
   }
 );
 
@@ -2674,7 +3091,7 @@ window.addEventListener(
 
     clearReconnectTimer();
 
-    clearMarketSurprise();
+    clearBlockEvent();
 
     closeCurrentSocket();
   }
@@ -2706,6 +3123,13 @@ connectToCoinbaseWebSocket();
 updateDailyMountains();
 
 
+/*
+  Establish the current chain tip without playing an
+  event for a block that existed before the page opened.
+*/
+checkForNewBitcoinBlock();
+
+
 setInterval(
   checkLivePriceConnection,
   CONNECTION_CHECK_INTERVAL
@@ -2719,4 +3143,24 @@ setInterval(
 setInterval(
   updateDailyMountains,
   DAILY_MOUNTAIN_REFRESH_INTERVAL
+);
+
+
+/*
+  Check for a newly mined Bitcoin block twice per minute.
+  The request returns only one small integer.
+*/
+setInterval(
+  checkForNewBitcoinBlock,
+  BLOCK_HEIGHT_CHECK_INTERVAL
+);
+
+
+/*
+  Keep the permanent sign's "Found ... ago" text current
+  without making any extra network requests.
+*/
+setInterval(
+  updateCurrentBlockAge,
+  BLOCK_AGE_UPDATE_INTERVAL
 );

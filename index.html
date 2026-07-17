@@ -129,75 +129,6 @@
 </span>
     </div>
 
-    <!-- Rare bull and bear market surprises -->
-    <div
-      class="market-surprise-layer"
-      aria-hidden="true"
-    >
-      <div
-        class="market-animal market-bull"
-        id="marketBull"
-      >
-        <svg
-          viewBox="0 0 180 90"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <ellipse cx="91" cy="45" rx="53" ry="25"></ellipse>
-          <circle cx="143" cy="43" r="18"></circle>
-
-          <path
-            d="M151 29 C164 13 174 17 165 33"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="7"
-            stroke-linecap="round"
-          ></path>
-
-          <path
-            d="M138 29 C126 13 116 17 124 33"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="7"
-            stroke-linecap="round"
-          ></path>
-
-          <rect x="54" y="60" width="10" height="24" rx="3"></rect>
-          <rect x="82" y="62" width="10" height="22" rx="3"></rect>
-          <rect x="112" y="61" width="10" height="23" rx="3"></rect>
-          <rect x="137" y="59" width="10" height="25" rx="3"></rect>
-
-          <path
-            d="M39 39 C21 29 17 17 25 12"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="6"
-            stroke-linecap="round"
-          ></path>
-        </svg>
-      </div>
-
-      <div
-        class="market-animal market-bear"
-        id="marketBear"
-      >
-        <svg
-          viewBox="0 0 180 95"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <ellipse cx="90" cy="49" rx="55" ry="28"></ellipse>
-          <circle cx="142" cy="41" r="21"></circle>
-          <circle cx="132" cy="23" r="8"></circle>
-          <circle cx="151" cy="22" r="8"></circle>
-          <ellipse cx="158" cy="46" rx="13" ry="9"></ellipse>
-
-          <rect x="48" y="63" width="13" height="25" rx="5"></rect>
-          <rect x="78" y="66" width="13" height="22" rx="5"></rect>
-          <rect x="111" y="65" width="13" height="23" rx="5"></rect>
-          <rect x="137" y="62" width="13" height="26" rx="5"></rect>
-        </svg>
-      </div>
-    </div>
-
     <!-- Slowly moving distant desert hills -->
     <div
       class="distant-hills"
@@ -390,6 +321,88 @@
 >
   <div class="tumbleweed"></div>
 </div>
+
+
+    <!-- Permanent Bitcoin network status -->
+    <aside
+      class="current-block-panel"
+      id="currentBlockPanel"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <span class="current-block-title">
+        CURRENT BLOCK
+      </span>
+
+      <strong
+        class="current-block-number"
+        id="currentBlockNumber"
+      >
+        Connecting...
+      </strong>
+
+      <span
+        class="current-block-age"
+        id="currentBlockAge"
+      >
+        Checking Bitcoin network
+      </span>
+    </aside>
+
+    <!-- Real Bitcoin block-mined surprise -->
+    <div
+      class="block-event-layer"
+      id="blockEventLayer"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <div
+        class="block-impact-site"
+        id="blockImpactSite"
+      >
+        <div
+          class="block-shadow"
+          aria-hidden="true"
+        ></div>
+
+        <div
+          class="falling-bitcoin-block"
+          id="fallingBitcoinBlock"
+          aria-hidden="true"
+        >
+          <span class="falling-bitcoin-mark">₿</span>
+        </div>
+
+        <div
+          class="block-impact-dust"
+          aria-hidden="true"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+      </div>
+
+      <div
+        class="block-mined-message"
+        id="blockMinedMessage"
+      >
+        <span class="block-mined-title">
+          NEW BLOCK MINED
+        </span>
+
+        <strong
+          class="block-mined-number"
+          id="blockMinedNumber"
+        ></strong>
+
+        <span class="block-mined-detail">
+          Added to the Bitcoin blockchain
+        </span>
+      </div>
+    </div>
+
     <!-- Live Bitcoin price-generated hills -->
     <svg
       class="bitcoin-hills"
